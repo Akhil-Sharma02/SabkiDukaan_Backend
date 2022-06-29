@@ -14,14 +14,8 @@ router.post("/postproduct", async (req, res) => {
         prod.img =
             "https://lightwidget.com/wp-content/uploads/local-file-not-found.png";
     const p = await Product.create(prod);
-    console.log("prod is ");
-    console.log(p);
-    console.log("user is");
-    console.log(req.user);
-    console.log(req.body);
     await currentUser.products.push({ product: p });
     await currentUser.save();
-    console.log("Posted Product");
 });
 
 router.get("/products", async (req, res) => {
@@ -30,7 +24,6 @@ router.get("/products", async (req, res) => {
 });
 
 router.get("/product/:id", async (req, res) => {
-    console.log(req.user);
     const { id } = req.params;
     const product = await Product.findById(id);
     res.send(product);
@@ -41,14 +34,10 @@ router.delete("/product/:id", async (req, res) => {
         "products.product"
     );
     const { id } = req.params;
-    console.log("id", id);
     const product = await Product.findByIdAndDelete(id);
-    console.log("product", product);
-    console.log(currentUser.products);
     const newarr = currentUser.products.filter((prod) => {
         return String(prod.product._id) != id;
     });
-    console.log(newarr);
     currentUser.products = newarr;
     await currentUser.save();
     res.send("OK");
@@ -57,7 +46,6 @@ router.delete("/product/:id", async (req, res) => {
 router.get("/sellproduct/:id", async (req, res) => {
     const { id } = req.params;
     const product = await Product.findByIdAndDelete(id);
-    console.log("product", product);
     const buyUserId = product.bids[0].byId;
     const buyUser = await User.findById(buyUserId);
     const bidsWon = buyUser.bidsWon;
@@ -71,14 +59,12 @@ router.get("/sellproduct/:id", async (req, res) => {
     bidsWon.unshift(prod);
     await buyUser.save();
     const sellUser = req.user;
-    console.log("sellUser", sellUser, "req user", req.user);
     const pastProd = sellUser.pastProducts;
     pastProd.push(prod);
     const prods = sellUser.products;
     const newarr = prods.filter((prod) => {
         return String(prod.product._id) != id;
     });
-    console.log(newarr);
     sellUser.products = newarr;
     await sellUser.save();
     res.send("Okay");
