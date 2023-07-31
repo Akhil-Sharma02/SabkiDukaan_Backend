@@ -14,6 +14,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
+mongoose.set("strictQuery", false);
 mongoose
     .connect(process.env.MONGO_URL)
     .then(() => {
